@@ -1,5 +1,4 @@
-test_rail
-=========
+# test_rail-api
 
 Ruby Client for v2 TestRail API
 
@@ -9,14 +8,14 @@ This library aims to provide two things:
 2. A ruby-like abstraction to help deal with the various
    testrail objects
 
-Usage
-=====
+## Usage
 
 There are two primary methods of use, you can either create your own API instance object and make calls through that or
-otherwise provide a config block and have a shared API instance and call methods directly on TestRail.
+otherwise provide a config block and have a shared API instance and call methods directly on TestRail. Just add the following require line to bring in the whole api:
 
-Unique API Instance
--------------------
+    require 'test_rail'
+
+### Unique API Instance
 
 The main entry point to the object is TestRail::API. To create
 the api object do:
@@ -35,8 +34,7 @@ From the project, you can get to your test_suites, runs or plans.
 We also manage section hierarchies for you so you can call
 successive sections and testsuites.
 
-Shared API instance
------------------------
+### Shared API instance
 
 An alternative method is to provide a config block, this specifies a default set of configuration options that will be
 used to connect to a test rail instance. The first time a call is made directly on the ```TestRail``` namespace an API object
@@ -56,11 +54,18 @@ used to connect to a test rail instance. The first time a call is made directly 
   TestRail.get_plan(plan_id: 1) => TestRail::Plan
 ```
 
-TESTING
-=======
+## TESTING
 
-Tests are mostly at the integration level, and require a testrail 
-instance to exercise the functions.
+Tests are mostly at the integration level, and require a TestRail 
+instance to exercise the functions. You will need to set up a test project in TestRail to
+run the tests against ... passing in the api user configuration as environment variables:
 
     bundle
+    export TEST_RAIL_PROJECT_ID=12 
+    export TEST_RAIL_NAMESPACE=yournamespace
+    export TEST_RAIL_USER=your@emailaddres.com
+    export TEST_RAIL_PASSWORD=passw0rd
     bundle exec rspec
+
+## Licence
+
