@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
 
   s.name        = 'test_rail-api'
-  s.version     = '0.4.0'
+  s.version     = '0.4.1'
   s.date        = '2014-05-05'
   s.summary     = 'Test Rail API'
   s.description = 'Ruby Client for v2 TestRail API'

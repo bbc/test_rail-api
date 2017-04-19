@@ -66,6 +66,53 @@ module TestRail
     end
 
     #
+    # Plan API calls
+    #
+
+    # Add a new plan
+    # (If plan already exists, a new one is created with the same name)
+    # api.add_plan( :project_id => 1, :name => 'My new Plan', :description => 'Test Plan' )
+    # Returns the plan object
+    def add_plan(args)
+      project_id = args[:project_id] or raise 'Missing project id (:project_id => 1)'
+      name = args[:name] or raise 'Missing plan name (:name => "My Test Plan")'
+      description = args[:description]
+
+      plan = post('add_plan', [project_id], { :name => name, :description => description })
+      TestRail::Plan.new(plan.merge({ :api => self }))
+    end
+
+    # Get a list of plans for a project
+    # api.get_plans( :project_id => 1 )
+    # Returns a list of plan objects
+    def get_plans(args)
+      id = args[:project_id] or raise "Missing project id (:project_id => 1)"
+      list = get('get_plans', [id])
+      list.collect do |item|
+        TestRail::Plan.new(item.merge({ :api => self }))
+      end
+    end
+
+    # Given a plan id, returns a plan (and populates internal run objects)
+    def get_plan(args)
+      plan_id = args[:plan_id] or raise "Missing plan id (:plan_id => 1)"
+      result = get('get_plan', [plan_id])
+      raw_runs = result['entries'].collect { |e| e['runs'] }.flatten
+      runs     = raw_runs.each.collect { |r| TestRail::Run.new(r.merge({ :api => self })) }
+      plan = TestRail::Plan.new(result.merge({ :api => self, :runs => runs }))
+      plan
+    end
+ 
+    def update_plan(args)
+      id = args[:id] or raise "Missing plan id (:id => 1)"
+      name        = args[:name]
+      description = args[:description]
+
+      plan = post('update_plan', [id], { :name => name, :description => description })
+      TestRail::Plan.new(plan.merge({ :api => self }))
+    end
+
+    #
     # Suite API calls
     #
 
@@ -243,18 +290,21 @@ module TestRail
       TestRail::Run.new(result.merge({ :api => self }))
     end
 
-    # Given a plan id, returns a plan (and populates internal run objects)
-    def get_plan(args)
-      plan_id = args[:plan_id] or raise "Missing plan id (:plan_id => 1)"
+    # Add a new run in test plan
+    # api.add_run_in_plan( :project_id => project_id, :plan_id => plan_id, :suite_id => suite_id )
+    def add_run_in_plan(args)
+      project_id = args[:project_id] or raise "Missing project id ( :project_id => 1)"
+      plan_id = args[:plan_id] or raise "Missing project id ( :project_id => 1)"
+      suite_id = args[:suite_id] or raise "Missing suite id ( :suite_id => 1)"
 
-      result = get('get_plan', [plan_id])
-
-      raw_runs = result['entries'].collect { |e| e['runs'] }.flatten
-      runs     = raw_runs.each.collect { |r| TestRail::Run.new(r.merge({ :api => self })) }
-
-      plan = TestRail::Plan.new(result.merge({ :api => self, :runs => runs }))
-
-      plan
+      params = { 
+                 :project_id => project_id,
+                 :suite_id => suite_id,
+                 :name     => args[:name],
+                 :description => args[:description] 
+               }
+      result = post('add_plan_entry', [plan_id], params)["runs"][0]
+      TestRail::Run.new(result.merge({ :api => self }))
     end
 
     def get_tests(args)
