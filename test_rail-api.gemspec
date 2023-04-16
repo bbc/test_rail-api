@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.homepage    = 'https://github.com/bbc/test_rail-api'
   s.license     = 'MIT'
 
-  s.add_runtime_dependency 'json', '~> 1.0'
+  s.add_runtime_dependency 'json', '>= 1', '< 3'
   s.add_runtime_dependency 'virtus', '~> 1.0'
 
   s.add_development_dependency 'rspec', "~> 2.14"
